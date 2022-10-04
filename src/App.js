@@ -1,24 +1,21 @@
-import logo from './logo.svg';
-import './App.css';
-
+import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
+import "./App.css";
+import Chat from "./chat/index";
+import Login from "./login/login";
+import { useEffect } from "react";
+import AuthProvider from "./context/authContext";
 function App() {
+  const history = useNavigate();
+  useEffect(() => {
+    history("/login");
+  }, []);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AuthProvider>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/chat" element={<Chat />} />
+      </Routes>
+    </AuthProvider>
   );
 }
 
