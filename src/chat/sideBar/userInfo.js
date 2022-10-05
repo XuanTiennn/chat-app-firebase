@@ -4,6 +4,8 @@ import React from "react";
 import styled from "styled-components";
 import { auth } from "../../firebase/config";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "./../../context/authContext";
+import { useContext } from "react";
 UserInfo.propTypes = {};
 const Wrapper = styled.div`
   display: flex;
@@ -16,11 +18,12 @@ const Text = styled(Typography.Text)`
 `;
 function UserInfo(props) {
   const history = useNavigate();
+  const user = useContext(AuthContext);
   return (
     <Wrapper>
       <div>
-        <Avatar icon={<UserOutlined />} size={"large"} />
-        <Text className="user_name">Taj Xuaan Tien</Text>
+        <Avatar src={user.photoUrl} icon={<UserOutlined />} size={"large"} />
+        <Text className="user_name">{user.displayName}</Text>
       </div>
       <Button
         ghost

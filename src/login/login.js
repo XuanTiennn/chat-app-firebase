@@ -2,11 +2,12 @@ import { Button, Col, Row } from "antd";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import React from "react";
 import { auth } from "../firebase/config";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import { addDocument, generateKeywords } from "./../firebase/service";
 Login.propTypes = {};
 const ggProvider = new GoogleAuthProvider();
 function Login(props) {
-  const history=useNavigate()
+  const history = useNavigate();
   const handleLogin = async (provider) => {
     signInWithPopup(auth, provider)
       .then((result) => {
@@ -15,8 +16,15 @@ function Login(props) {
         const token = credential.accessToken;
         // The signed-in user info.
         const user = result.user;
-        // ...
-        history('/chat')
+        addDocument("users", {
+          displayName: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL,
+          uid: user.uid,
+          keywords: generateKeywords(user.displayName?.toLowerCase()),
+        });
+
+        history("/chat");
       })
       .catch((error) => {
         // Handle Errors here.

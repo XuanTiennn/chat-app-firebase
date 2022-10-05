@@ -1,9 +1,11 @@
-import React from "react";
-import PropTypes from "prop-types";
+import React, { useContext, useMemo } from "react";
 import styled from "styled-components";
-import Message from "./message";
+import { AppContext } from "./../../context/appContext";
 import InputText from "./input";
+import Message from "./message";
 import RoomInfo from "./roomInfo";
+import useFireStore from "./../../hooks/useFireStore";
+import { Typography } from "antd";
 
 ChatContent.propTypes = {};
 const ChatContentStyle = styled.div`
@@ -15,15 +17,40 @@ const ChatContentStyle = styled.div`
   justify-content: space-between;
 `;
 function ChatContent(props) {
+  const app = useContext(AppContext);
+  const [selectedRoom] = app.selectedRoom;
+  const messagesCondition = useMemo(() => {
+    return {
+      fieldName: "roomId",
+      operator: "==",
+      compareValue: selectedRoom.id,
+    };
+  }, [selectedRoom.id]);
+  const messages = useFireStore("messages", messagesCondition);
+  console.log(selectedRoom);
   return (
     <ChatContentStyle>
-      <RoomInfo />
-      <div>
-        {[1, 2, 3, 4, 5, 65, 6, 7, 78, 8, 8, 3].map((x) => 
-          <Message />
-        )}
-        <InputText />
-      </div>
+      {Object.keys(selectedRoom)?.length > 0 ? (
+        <>
+          {" "}
+          <RoomInfo />
+          <div>
+            {messages?.map((x, index) => (
+              <Message
+                key={index}
+                text={x.value}
+                user={x}
+                createAt={x.createAt?.seconds}
+              />
+            ))}
+            <InputText />{" "}
+          </div>
+        </>
+      ) : (
+        <Typography.Paragraph type="center">
+          Vui lòng chọn phong chat
+        </Typography.Paragraph>
+      )}
     </ChatContentStyle>
   );
 }

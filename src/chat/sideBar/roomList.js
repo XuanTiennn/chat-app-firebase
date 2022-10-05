@@ -1,7 +1,12 @@
-import { Collapse, Typography } from "antd";
-import React from "react";
+import { Button, Collapse, Typography } from "antd";
+import React, { useState, useContext, useMemo } from "react";
 import styled from "styled-components";
 import { CaretRightOutlined } from "@ant-design/icons";
+import { addDocument } from "./../../firebase/service";
+import CreateRoom from "./createRoom";
+import { AuthContext } from "./../../context/authContext";
+import useFireStore from "./../../hooks/useFireStore";
+import { AppContext } from "./../../context/appContext";
 
 RoomList.propTypes = {};
 const { Panel } = Collapse;
@@ -23,14 +28,32 @@ const StylePanel = styled(Panel)`
 `;
 const Text = styled(Typography.Text)`
   color: white;
+  cursor: pointer;
 `;
 
 function RoomList(props) {
+  const [show, setShow] = useState(false);
+  const user = useContext(AuthContext);
+  const app = useContext(AppContext);
+  const [selectedRoom, setSelectedRoom] = app.selectedRoom;
+  const condition = useMemo(() => {
+    return {
+      fieldName: "members",
+      operator: "array-contains",
+      compareValue: user.userId,
+    };
+  }, [user.userId]);
+  const rooms = useFireStore("rooms", condition);
+  const createRoom = (name, description) => {
+    const { accessToken, providerUserInfo, ...remain } = user;
+    addDocument("rooms", { name, description, members: [user.userId] });
+    setShow(false);
+  };
   return (
     <WrapperStyle>
-      <Typography.Text style={{ color: "white" }}>
-        Danh sách các phòng
-      </Typography.Text>
+      <Button ghost onClick={() => setShow(true)}>
+        Tạo phòng mới
+      </Button>
       <Collapse
         ghost
         defaultActiveKey={["1"]}
@@ -42,12 +65,24 @@ function RoomList(props) {
         )}
         className="site-collapse-custom-collapse"
       >
-        <StylePanel className="site-collapse-custom-panel" key={1}>
-          <Text className="room_name"> Phong 1</Text>
-          <Text className="room_name"> Phong 2</Text>
-          <Text className="room_name"> Phong 3</Text>
+        <StylePanel
+          header="Danh sách các phòng"
+          className="site-collapse-custom-panel"
+          style={{ color: "white" }}
+          key={1}
+        >
+          {rooms?.map((room) => (
+            <Text
+              className="room_name"
+              style={{ color: room.id === selectedRoom.id && "blue" }}
+              onClick={() => setSelectedRoom(room)}
+            >
+              {room.name}
+            </Text>
+          ))}
         </StylePanel>
       </Collapse>
+      <CreateRoom show={show} setShow={setShow} createRoom={createRoom} />
     </WrapperStyle>
   );
 }

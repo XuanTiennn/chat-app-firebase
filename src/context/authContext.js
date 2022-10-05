@@ -8,15 +8,22 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState({});
   useEffect(() => {
     const unsubscribed = auth.onAuthStateChanged((user) => {
-      console.log(user);
       if (user) {
-        setUser(user);
+        const { accessToken, reloadUserInfo } = user;
+        setUser({
+          accessToken,
+          ...reloadUserInfo,
+          userId: user.uid,
+        });
+        history("/chat");
       } else {
         setUser({});
+        history("/login");
       }
     });
     return unsubscribed();
   }, [history]);
+
   return <AuthContext.Provider value={user}>{children}</AuthContext.Provider>;
 };
 export default AuthProvider;
