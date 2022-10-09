@@ -26,7 +26,6 @@ function RoomInfo(props) {
     // reset form value
     form.resetFields();
     setValue([]);
-
     // update members in current room
     const roomRef = db.collection("rooms").doc(selectedRoom.id);
 
@@ -46,7 +45,7 @@ function RoomInfo(props) {
         </Button>
         <Avatar.Group maxCount={2}>
           {members?.map((x, index) => (
-            <Tooltip key={x.id} title="Ant User" placement="top">
+            <Tooltip key={x.id} title={x.displayName} placement="top">
               <Avatar
                 style={{
                   backgroundColor: "#87d068",

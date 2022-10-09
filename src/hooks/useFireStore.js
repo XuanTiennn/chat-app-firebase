@@ -5,7 +5,6 @@ import { db } from "../firebase/config";
 useFireStore.propTypes = {};
 
 function useFireStore(colection, condition) {
-  console.log(colection, condition);
   const [document, setDocument] = useState();
   // Loads chat messages history and listens for upcoming ones.
   function loadData() {
@@ -16,10 +15,9 @@ function useFireStore(colection, condition) {
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const data = [];
       querySnapshot.forEach((doc) => {
-        
-        data.push({...doc.data(),id:doc.id});
+        data.push({ ...doc.data(), id: doc.id });
       });
-      setDocument(data)
+      setDocument(data);
     });
   }
   useEffect(() => {

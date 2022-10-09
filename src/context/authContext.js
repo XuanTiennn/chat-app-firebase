@@ -9,6 +9,7 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribed = auth.onAuthStateChanged((user) => {
       if (user) {
+        console.log(user);
         const { accessToken, reloadUserInfo } = user;
         setUser({
           accessToken,
@@ -16,12 +17,16 @@ const AuthProvider = ({ children }) => {
           userId: user.uid,
         });
         history("/chat");
+        console.log(1);
       } else {
+        console.log(2);
         setUser({});
         history("/login");
       }
     });
-    return unsubscribed();
+    return () => {
+      unsubscribed();
+    };
   }, [history]);
 
   return <AuthContext.Provider value={user}>{children}</AuthContext.Provider>;

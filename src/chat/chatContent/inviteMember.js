@@ -1,5 +1,5 @@
 import { Avatar, Form, Modal, Select, Spin } from "antd";
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useContext } from "react";
 import { db } from "../../firebase/config";
 import { debounce } from "lodash";
 import {
@@ -10,6 +10,7 @@ import {
   onSnapshot,
   orderBy,
 } from "firebase/firestore";
+import { AuthContext } from "./../../context/authContext";
 InviteMember.propTypes = {};
 function DebounceSelect({
   fetchOptions,
@@ -69,33 +70,24 @@ async function fetchUserList(search, curMembers) {
     orderBy("displayName"),
     limit(20)
   );
-  return onSnapshot(q, (querySnapshot) => {
-    return querySnapshot.docs
-      .map((doc) => ({
+  const data = [];
+  onSnapshot(q, (querySnapshot) => {
+    querySnapshot.forEach((doc) => {
+      data.push({
+        ...doc.data(),
         label: doc.data().displayName,
         value: doc.data().uid,
         photoURL: doc.data().photoURL,
-      }))
-      .filter((opt) => !curMembers.includes(opt.value));
+      });
+    });
+    data.filter((opt) => !curMembers.includes(opt.value));
   });
-  //   db
-  //     .collection("users")
-  //     .where("keywords", "array-contains", search?.toLowerCase())
-  //     .orderBy("displayName")
-  //     .limit(20)
-  //     .get()
-  //     .then((snapshot) => {
-  //       return snapshot.docs
-  //         .map((doc) => ({
-  //           label: doc.data().displayName,
-  //           value: doc.data().uid,
-  //           photoURL: doc.data().photoURL,
-  //         }))
-  //         .filter((opt) => !curMembers.includes(opt.value));
-  //     });
+
+  return data;
 }
 function InviteMember({ show, setShow, inviteMember, form, selectedRoom }) {
   const [value, setValue] = useState();
+  const user = useContext(AuthContext);
   return (
     <div>
       <Modal
@@ -111,7 +103,7 @@ function InviteMember({ show, setShow, inviteMember, form, selectedRoom }) {
             label="Tên các thành viên"
             value={value}
             placeholder="Nhập tên thành viên"
-            fetchOptions={fetchUserList}
+            fetchOptions={() => fetchUserList(value, user.userId)}
             onChange={(newValue) => setValue(newValue)}
             style={{ width: "100%" }}
             curMembers={selectedRoom.members}
