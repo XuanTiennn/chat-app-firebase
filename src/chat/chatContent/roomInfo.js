@@ -12,6 +12,7 @@ const RoomStyle = styled.div`
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid #eee;
+  background-color: #5F5B8F;
 `;
 const Users = styled.div`
   display: flex;

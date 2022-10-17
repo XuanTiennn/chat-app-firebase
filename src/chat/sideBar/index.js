@@ -7,7 +7,7 @@ import { Col, Row } from "antd";
 
 SideBar.propTypes = {};
 const StyleSibar = styled.div`
-  background: #3f0e40;
+  background: #3e3c61;
   color: white;
   height: 100vh;
   padding: 15px 7px;

@@ -20,11 +20,13 @@ function InputText(props) {
       displayName: user.displayName,
       photoURL: user.displayName,
     });
+    setMessage("");
   };
 
   return (
     <FormStyle>
       <Input
+        value={message}
         placeholder="Nhập nội dung"
         onChange={(e) => setMessage(e.target.value)}
       />

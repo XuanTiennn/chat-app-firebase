@@ -10,6 +10,7 @@ export const addDocument = async (collectio, data) => {
       ...data,
       createAt: serverTimestamp(),
       timestamp: serverTimestamp(),
+      time: new Date(),
     });
   } catch (error) {
     console.error("Error writing new message to Firebase Database", error);

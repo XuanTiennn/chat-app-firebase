@@ -11,10 +11,14 @@ const Wrapper = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background-color: #2f2d52;
 `;
 const Text = styled(Typography.Text)`
   color: white;
   margin-left: 5px;
+`;
+const ButtonStyle = styled(Button)`
+  border-radius: 5px;
 `;
 function UserInfo(props) {
   const history = useNavigate();
@@ -25,15 +29,16 @@ function UserInfo(props) {
         <Avatar src={user.photoUrl} icon={<UserOutlined />} size={"large"} />
         <Text className="user_name">{user.displayName}</Text>
       </div>
-      <Button
+      <ButtonStyle
         ghost
         onClick={() => {
           auth.signOut();
           history("/login");
+          localStorage.removeItem("token");
         }}
       >
         Đăng xuất
-      </Button>
+      </ButtonStyle>
     </Wrapper>
   );
 }

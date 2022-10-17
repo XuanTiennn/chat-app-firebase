@@ -30,7 +30,9 @@ const Text = styled(Typography.Text)`
   color: white;
   cursor: pointer;
 `;
-
+const ButtonStyle=styled(Button)`
+  border-radius: 5px;
+`
 function RoomList(props) {
   const [show, setShow] = useState(false);
   const user = useContext(AuthContext);
@@ -51,9 +53,9 @@ function RoomList(props) {
   };
   return (
     <WrapperStyle>
-      <Button ghost onClick={() => setShow(true)}>
+      <ButtonStyle ghost onClick={() => setShow(true)}>
         Tạo phòng mới
-      </Button>
+      </ButtonStyle>
       <Collapse
         ghost
         defaultActiveKey={["1"]}

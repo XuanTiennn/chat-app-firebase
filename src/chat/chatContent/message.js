@@ -1,10 +1,9 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { Avatar, Input, Typography } from "antd";
 import { UserOutlined } from "@ant-design/icons";
-import styled from "styled-components";
-import useFireStore from "./../../hooks/useFireStore";
+import { Avatar, Typography } from "antd";
 import { formatRelative } from "date-fns/esm";
+import React, { useContext } from "react";
+import styled from "styled-components";
+import { AuthContext } from "./../../context/authContext";
 Message.propTypes = {};
 const MessageStyle = styled.div`
   padding: 5px;
@@ -12,6 +11,7 @@ const MessageStyle = styled.div`
   width: 200px;
   margin-top: 5px;
 `;
+
 function formatDate(seconds) {
   let formattedDate = "";
 
@@ -25,18 +25,27 @@ function formatDate(seconds) {
   return formattedDate;
 }
 function Message({ text, createAt, user }) {
+  const userLogin = useContext(AuthContext);
   return (
     <div>
-      <div>
-        <Avatar icon={<UserOutlined />} size={"small"} />
-        <Typography.Text className="user_name">
-          {user.displayName}
-        </Typography.Text>
-        <Typography.Text>{formatDate(createAt)}</Typography.Text>
+      <div
+        style={{
+          display: "flex",
+          justifyContent:
+            user.userId === userLogin.userId ? "flex-end" : "flex-start",
+        }}
+      >
+        <div>
+          <Avatar icon={<UserOutlined />} size={"small"} />
+          <Typography.Text className="user_name">
+            {user.displayName}
+          </Typography.Text>
+          <Typography.Text>{formatDate(createAt)}</Typography.Text>
+        </div>
+        <MessageStyle>
+          <span>{text}</span>
+        </MessageStyle>
       </div>
-      <MessageStyle>
-        <span>{text}</span>
-      </MessageStyle>
     </div>
   );
 }
