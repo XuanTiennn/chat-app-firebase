@@ -7,9 +7,12 @@ import { AuthContext } from "./../../context/authContext";
 Message.propTypes = {};
 const MessageStyle = styled.div`
   padding: 5px;
-  background-color: #eee;
+  background-color: #879fff;
   width: 200px;
   margin-top: 5px;
+  border-radius: 5px;
+  color: #bebdd5;
+  margin-bottom: 10px;
 `;
 
 function formatDate(seconds) {
@@ -26,24 +29,33 @@ function formatDate(seconds) {
 }
 function Message({ text, createAt, user }) {
   const userLogin = useContext(AuthContext);
+
   return (
     <div>
       <div
         style={{
           display: "flex",
-          justifyContent:
-            user.userId === userLogin.userId ? "flex-end" : "flex-start",
+          flexDirection: "column",
+          margin: "0 5px",
+          alignItems:
+            user?.userId === userLogin?.userId ? "flex-end" : "flex-start",
         }}
       >
         <div>
-          <Avatar icon={<UserOutlined />} size={"small"} />
+          <Avatar src={user?.photoURL} icon={<UserOutlined />} size={"small"} />
           <Typography.Text className="user_name">
-            {user.displayName}
+            {user?.displayName}
           </Typography.Text>
-          <Typography.Text>{formatDate(createAt)}</Typography.Text>
+          <Typography.Text style={{ marginLeft: "5px" }}>
+            {formatDate(createAt)}
+          </Typography.Text>
         </div>
         <MessageStyle>
-          <span>{text}</span>
+          <span
+            style={{ color: user?.userId === userLogin?.userId && "#E5F6FF" }}
+          >
+            {text}
+          </span>
         </MessageStyle>
       </div>
     </div>

@@ -7,6 +7,12 @@ import { AppContext } from "./../../context/appContext";
 const FormStyle = styled.div`
   display: flex;
 `;
+const ButtonStyle = styled(Button)`
+  background-color: #6a7cc5;
+`;
+const InputStyle = styled(Input)`
+  padding: 5px;
+`;
 function InputText(props) {
   const [message, setMessage] = useState("");
   const user = useContext(AuthContext);
@@ -18,21 +24,21 @@ function InputText(props) {
       userId: user.userId,
       roomId: selectedRoom.id,
       displayName: user.displayName,
-      photoURL: user.displayName,
+      photoURL: user.photoUrl,
     });
     setMessage("");
   };
 
   return (
     <FormStyle>
-      <Input
+      <InputStyle
         value={message}
         placeholder="Nhập nội dung"
         onChange={(e) => setMessage(e.target.value)}
       />
-      <Button type="primary" onClick={addMessage}>
+      <ButtonStyle type="primary" onClick={addMessage}>
         Gửi
-      </Button>
+      </ButtonStyle>
     </FormStyle>
   );
 }

@@ -10,7 +10,6 @@ const StyleSibar = styled.div`
   background: #3e3c61;
   color: white;
   height: 100vh;
-  padding: 15px 7px;
 `;
 function SideBar(props) {
   return (

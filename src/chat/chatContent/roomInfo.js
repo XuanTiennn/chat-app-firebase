@@ -1,4 +1,4 @@
-import { UserOutlined } from "@ant-design/icons";
+import { UserAddOutlined, UserOutlined } from "@ant-design/icons";
 import { Avatar, Button, Form, Tooltip, Typography } from "antd";
 import React, { useContext, useState } from "react";
 import styled from "styled-components";
@@ -12,11 +12,18 @@ const RoomStyle = styled.div`
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid #eee;
-  background-color: #5F5B8F;
+  background-color: #5f5b8f;
+  padding: 5px;
 `;
 const Users = styled.div`
   display: flex;
   align-items: center;
+`;
+const TitleStyle = styled(Typography.Title)`
+  color: white !important;
+`;
+const TextStyle = styled(Typography.Text)`
+  color: white !important;
 `;
 function RoomInfo(props) {
   const app = useContext(AppContext);
@@ -37,36 +44,42 @@ function RoomInfo(props) {
   return (
     <RoomStyle>
       <div>
-        <Typography.Title>{selectedRoom.name}</Typography.Title>
-        <Typography.Text>{selectedRoom.description}</Typography.Text>
+        <TitleStyle>{selectedRoom[0].name}</TitleStyle>
+        <TextStyle>{selectedRoom[0].description}</TextStyle>
       </div>
-      <Users>
-        <Button onClick={() => setShow(true)} style={{ marginRight: "5px" }}>
-          Thêm thành viên
-        </Button>
-        <Avatar.Group maxCount={2}>
-          {members?.map((x, index) => (
-            <Tooltip key={x.id} title={x.displayName} placement="top">
-              <Avatar
-                style={{
-                  backgroundColor: "#87d068",
-                }}
-                src={x.photoURL}
-                icon={<UserOutlined />}
-              >
-                {" "}
-              </Avatar>
-            </Tooltip>
-          ))}
-        </Avatar.Group>
-      </Users>
-      <InviteMember
-        form={form}
-        show={show}
-        setShow={setShow}
-        inviteMember={inviteMember}
-        selectedRoom={selectedRoom}
-      />
+      <div>
+        <Users>
+          <Button
+            ghost
+            onClick={() => setShow(true)}
+            style={{ marginRight: "5px" }}
+          >
+            <UserAddOutlined />
+          </Button>
+          <Avatar.Group maxCount={2}>
+            {members?.map((x, index) => (
+              <Tooltip key={x.id} title={x.displayName} placement="top">
+                <Avatar
+                  style={{
+                    backgroundColor: "#87d068",
+                  }}
+                  src={x.photoURL}
+                  icon={<UserOutlined />}
+                >
+                  {" "}
+                </Avatar>
+              </Tooltip>
+            ))}
+          </Avatar.Group>
+        </Users>
+        <InviteMember
+          form={form}
+          show={show}
+          setShow={setShow}
+          inviteMember={inviteMember}
+          selectedRoom={selectedRoom}
+        />
+      </div>
     </RoomStyle>
   );
 }

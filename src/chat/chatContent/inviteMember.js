@@ -63,31 +63,45 @@ function DebounceSelect({
     </Select>
   );
 }
-async function fetchUserList(search, curMembers) {
+async function fetchUserList(search, curMembers = []) {
+  // console.log({ search, curMembers });
+  // const q = query(
+  //   collection(db, "users"),
+  //   where("keywords", "array-contains", search?.toLowerCase()),
+  //   orderBy("displayName"),
+  //   limit(20)
+  // );
   const q = query(
     collection(db, "users"),
-    where("keywords", "array-contains", search?.toLowerCase()),
-    orderBy("displayName"),
-    limit(20)
+    where("keywords", "array-contains", search?.toLowerCase())
   );
   const data = [];
-  onSnapshot(q, (querySnapshot) => {
+  const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    // const data = [];
     querySnapshot.forEach((doc) => {
-      data.push({
-        ...doc.data(),
-        label: doc.data().displayName,
-        value: doc.data().uid,
-        photoURL: doc.data().photoURL,
-      });
+      data.push({ ...doc.data(), id: doc.id });
     });
-    data.filter((opt) => !curMembers.includes(opt.value));
+    // setDocument(data);
   });
+ 
+  // onSnapshot(q, (querySnapshot) => {
+  //   querySnapshot.forEach((doc) => {
+  //     data.push({
+  //       ...doc.data(),
+  //       label: doc.data().displayName,
+  //       value: doc.data().uid,
+  //       photoURL: doc.data().photoURL,
+  //     });
+  //   });
+  //   data.filter((opt) => !curMembers.includes(opt.value));
+  // });
 
   return data;
 }
 function InviteMember({ show, setShow, inviteMember, form, selectedRoom }) {
   const [value, setValue] = useState();
   const user = useContext(AuthContext);
+  console.log(value);
   return (
     <div>
       <Modal
@@ -103,7 +117,7 @@ function InviteMember({ show, setShow, inviteMember, form, selectedRoom }) {
             label="Tên các thành viên"
             value={value}
             placeholder="Nhập tên thành viên"
-            fetchOptions={() => fetchUserList(value, user.userId)}
+            fetchOptions={fetchUserList}
             onChange={(newValue) => setValue(newValue)}
             style={{ width: "100%" }}
             curMembers={selectedRoom.members}

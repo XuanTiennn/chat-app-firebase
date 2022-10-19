@@ -12,6 +12,7 @@ const Wrapper = styled.div`
   justify-content: space-between;
   align-items: center;
   background-color: #2f2d52;
+  padding: 10px;
 `;
 const Text = styled(Typography.Text)`
   color: white;

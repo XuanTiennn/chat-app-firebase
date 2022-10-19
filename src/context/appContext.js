@@ -1,4 +1,4 @@
-import { createContext, useState ,useMemo} from "react";
+import { createContext, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import useFireStore from "./../hooks/useFireStore";
 
@@ -13,7 +13,7 @@ const AppProvider = ({ children }) => {
       compareValue: selectedRoom.members,
     };
   }, [selectedRoom.members]);
-  const members = useFireStore("users", userCondition);
+  const [members] = useFireStore("users", userCondition);
   const value = {
     selectedRoom: [selectedRoom, setSelectedRoom],
     members,

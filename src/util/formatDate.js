@@ -1,4 +1,5 @@
-import { formatRelative } from 'date-fns/esm';
+import { formatISO9075 } from "date-fns";
+import { formatRelative } from "date-fns/esm";
 export const formatDate = (seconds) => {
   let formattedDate = "";
 
@@ -10,4 +11,11 @@ export const formatDate = (seconds) => {
   }
 
   return formattedDate;
+};
+export const formatSecondsToDate = (seconds) => {
+  let result = "";
+  if (seconds) {
+    result = formatISO9075(new Date(seconds * 1000));
+  }
+  return result;
 };

@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
-import { collection, query, where, onSnapshot } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  onSnapshot,
+  orderBy,
+} from "firebase/firestore";
 import { db } from "../firebase/config";
+import { formatSecondsToDate } from "../util/formatDate";
 
 useFireStore.propTypes = {};
 
@@ -17,20 +24,26 @@ function useFireStore(colection, condition) {
       querySnapshot.forEach((doc) => {
         data.push({ ...doc.data(), id: doc.id });
       });
-      setDocument(data);
+      if (colection === "messages") {
+        if (data?.length > 0) {
+          data.map((mes) => {
+            mes.createBy = formatSecondsToDate(mes.createAt?.seconds);
+          });
+          data.sort((a, b) => new Date(a.createBy) - new Date(b.createBy));
+          setDocument(data);
+        }
+      } else {
+        setDocument(data);
+      }
     });
   }
   useEffect(() => {
-    try {
-      if (condition.compareValue && condition.compareValue?.length > 0) {
-        loadData();
-      }
-    } catch (error) {
-      console.log(error);
+    if (condition.compareValue && condition.compareValue?.length > 0) {
+      loadData();
     }
   }, [colection, condition]);
 
-  return document;
+  return [document, setDocument];
 }
 
 export default useFireStore;
