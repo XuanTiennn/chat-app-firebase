@@ -1,15 +1,15 @@
-import { Button, Collapse, Input, Typography } from "antd";
-import React, { useState, useContext, useMemo } from "react";
+import { CaretRightOutlined } from "@ant-design/icons";
+import { Avatar, Button, Collapse, Select, Spin, Tag, Typography } from "antd";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
+import _ from "lodash";
+import React, { useContext, useMemo, useState } from "react";
 import styled from "styled-components";
-import { CaretRightOutlined, SearchOutlined } from "@ant-design/icons";
-import { addDocument } from "./../../firebase/service";
-import CreateRoom from "./createRoom";
-import { AuthContext } from "./../../context/authContext";
-import useFireStore from "./../../hooks/useFireStore";
-import { AppContext } from "./../../context/appContext";
-import { collection, onSnapshot, query } from "firebase/firestore";
-import { where } from "firebase/firestore";
 import { db } from "../../firebase/config";
+import { AppContext } from "./../../context/appContext";
+import { AuthContext } from "./../../context/authContext";
+import { addDocument } from "./../../firebase/service";
+import useFireStore from "./../../hooks/useFireStore";
+import CreateRoom from "./createRoom";
 
 RoomList.propTypes = {};
 const { Panel } = Collapse;
@@ -38,12 +38,14 @@ const ButtonStyle = styled(Button)`
   margin-left: 5px;
   margin-top: 5px;
 `;
-const InputStyle = styled(Input.Search)`
+const InputStyle = styled(Select)`
   width: 95%;
   margin-left: 5px;
 `;
 function RoomList(props) {
   const [show, setShow] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [userSearch, setUserSearch] = useState([]);
   const user = useContext(AuthContext);
   const app = useContext(AppContext);
   const [selectedRoom, setSelectedRoom] = app.selectedRoom;
@@ -61,6 +63,9 @@ function RoomList(props) {
     setShow(false);
   };
   const findUser = (keyWord) => {
+    console.log(keyWord);
+    setLoading(true);
+    setUserSearch([]);
     const q = query(
       collection(db, "users"),
       where("keywords", "array-contains", keyWord?.toLowerCase())
@@ -68,18 +73,77 @@ function RoomList(props) {
     const data = [];
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       querySnapshot.forEach((doc) => {
-        data.push({ ...doc.data(), id: doc.id });
+        data.push({
+          ...doc.data(),
+          id: doc.id,
+          label: doc.data().displayName,
+          value: doc.data().email,
+        });
       });
-      console.log(data.filter(u=>u.userId !== user.userId));
+      const _data = data.filter((u) => u.userId !== user.userId);
+      setLoading(false);
+      setUserSearch(_.unionBy(_data, (u) => u.email));
     });
+  };
+  const tagRender = (props) => {
+    const { label, value, closable, onClose } = props;
+    const onPreventMouseDown = (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+    };
+    return (
+      <Tag
+        color={value}
+        onMouseDown={onPreventMouseDown}
+        closable={closable}
+        onClose={onClose}
+        style={{
+          marginRight: 3,
+          color: "black",
+        }}
+      >
+        <Avatar
+          size="small"
+          src={
+            userSearch?.find((u) => u.email === value)?.photoURL ||
+            label?.charAt(0)?.toUpperCase()
+          }
+        ></Avatar>
+        {` ${label}`}
+      </Tag>
+    );
+  };
+  const handleChange = (value) => {
+    console.log(value);
   };
   return (
     <WrapperStyle>
       <InputStyle
+        tagRender={tagRender}
+        labelInValue
         placeholder={"Tìm người"}
-        onChange={(e) => findUser(e.target.value)}
-      />
+        onSearch={findUser}
+        notFoundContent={loading ? <Spin size="small" /> : null}
+        optionLabelProp="title"
+        onChange={handleChange}
+      >
+        {userSearch?.map((opt) => (
+          <Select.Option key={opt.value} value={opt.value} title={opt.label}>
+            <div className="demo-option-label-item">
+              <Avatar
+                size="small"
+                src={
+                  opt.photoURL
+                    ? opt.photoURL
+                    : opt.label?.charAt(0)?.toUpperCase()
+                }
+              />
 
+              {` ${opt.label}`}
+            </div>
+          </Select.Option>
+        ))}
+      </InputStyle>
       <ButtonStyle ghost onClick={() => setShow(true)}>
         Tạo phòng mới
       </ButtonStyle>

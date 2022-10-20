@@ -1,7 +1,7 @@
 import { Avatar, Form, Modal, Select, Spin } from "antd";
 import React, { useState, useMemo, useEffect, useContext } from "react";
 import { db } from "../../firebase/config";
-import { debounce } from "lodash";
+import _, { debounce } from "lodash";
 import {
   where,
   limit,
@@ -64,7 +64,7 @@ function DebounceSelect({
   );
 }
 async function fetchUserList(search, curMembers = []) {
-  // console.log({ search, curMembers });
+  console.log(search);
   // const q = query(
   //   collection(db, "users"),
   //   where("keywords", "array-contains", search?.toLowerCase()),
@@ -77,31 +77,25 @@ async function fetchUserList(search, curMembers = []) {
   );
   const data = [];
   const unsubscribe = onSnapshot(q, (querySnapshot) => {
-    // const data = [];
     querySnapshot.forEach((doc) => {
-      data.push({ ...doc.data(), id: doc.id });
+      console.log(doc.data());
+      data.push({
+        ...doc.data(),
+        id: doc.id,
+        label: doc.data().displayName,
+        value: doc.data().email,
+      });
     });
-    // setDocument(data);
   });
- 
-  // onSnapshot(q, (querySnapshot) => {
-  //   querySnapshot.forEach((doc) => {
-  //     data.push({
-  //       ...doc.data(),
-  //       label: doc.data().displayName,
-  //       value: doc.data().uid,
-  //       photoURL: doc.data().photoURL,
-  //     });
-  //   });
-  //   data.filter((opt) => !curMembers.includes(opt.value));
-  // });
+  // const _data = data.filter((u) => u.userId !== user.userId);
 
-  return data;
+  console.log(data);
+  return _.unionBy(data, (u) => u.email);
 }
 function InviteMember({ show, setShow, inviteMember, form, selectedRoom }) {
   const [value, setValue] = useState();
   const user = useContext(AuthContext);
-  console.log(value);
+
   return (
     <div>
       <Modal
