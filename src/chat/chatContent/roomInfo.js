@@ -14,6 +14,9 @@ const RoomStyle = styled.div`
   border-bottom: 1px solid #eee;
   background-color: #5f5b8f;
   padding: 5px;
+  position: relative;
+  width: 100%;
+  z-index: 1000;
 `;
 const Users = styled.div`
   display: flex;
@@ -44,42 +47,46 @@ function RoomInfo(props) {
   return (
     <RoomStyle>
       <div>
-        <TitleStyle>{selectedRoom[0].name}</TitleStyle>
+        <TitleStyle>
+          {selectedRoom[0].name || selectedRoom[0].toUserName}
+        </TitleStyle>
         <TextStyle>{selectedRoom[0].description}</TextStyle>
       </div>
-      <div>
-        <Users>
-          <Button
-            ghost
-            onClick={() => setShow(true)}
-            style={{ marginRight: "5px" }}
-          >
-            <UserAddOutlined />
-          </Button>
-          <Avatar.Group maxCount={2}>
-            {members?.map((x, index) => (
-              <Tooltip key={x.id} title={x.displayName} placement="top">
-                <Avatar
-                  style={{
-                    backgroundColor: "#87d068",
-                  }}
-                  src={x.photoURL}
-                  icon={<UserOutlined />}
-                >
-                  {" "}
-                </Avatar>
-              </Tooltip>
-            ))}
-          </Avatar.Group>
-        </Users>
-        <InviteMember
-          form={form}
-          show={show}
-          setShow={setShow}
-          inviteMember={inviteMember}
-          selectedRoom={selectedRoom}
-        />
-      </div>
+      {selectedRoom[0]?.type === "room" && (
+        <div>
+          <Users>
+            <Button
+              ghost
+              onClick={() => setShow(true)}
+              style={{ marginRight: "5px" }}
+            >
+              <UserAddOutlined />
+            </Button>
+            <Avatar.Group maxCount={2}>
+              {members?.map((x, index) => (
+                <Tooltip key={x.id} title={x.displayName} placement="top">
+                  <Avatar
+                    style={{
+                      backgroundColor: "#87d068",
+                    }}
+                    src={x.photoURL}
+                    icon={<UserOutlined />}
+                  >
+                    {" "}
+                  </Avatar>
+                </Tooltip>
+              ))}
+            </Avatar.Group>
+          </Users>
+          <InviteMember
+            form={form}
+            show={show}
+            setShow={setShow}
+            inviteMember={inviteMember}
+            selectedRoom={selectedRoom}
+          />
+        </div>
+      )}
     </RoomStyle>
   );
 }

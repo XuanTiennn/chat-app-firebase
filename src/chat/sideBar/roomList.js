@@ -12,7 +12,6 @@ import useFireStore from "./../../hooks/useFireStore";
 import CreateRoom from "./createRoom";
 
 RoomList.propTypes = {};
-const { Panel } = Collapse;
 const WrapperStyle = styled.div`
   margin-top: 15px;
   ant-collapse-header: {
@@ -21,18 +20,6 @@ const WrapperStyle = styled.div`
   }
 `;
 
-const StylePanel = styled(Panel)`
-  .ant-collapse-content-box {
-    padding: 0 20px;
-    padding-top: 0;
-    display: flex;
-    flex-direction: column;
-  }
-`;
-const Text = styled(Typography.Text)`
-  color: white;
-  cursor: pointer;
-`;
 const ButtonStyle = styled(Button)`
   border-radius: 5px;
   margin-left: 5px;
@@ -40,6 +27,21 @@ const ButtonStyle = styled(Button)`
 `;
 const InputStyle = styled(Select)`
   width: 95%;
+  margin-left: 5px;
+  background-color: black;
+`;
+const StyleTag = styled(Button)`
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+`;
+const StyleRoom = styled.div`
+  padding: 5px;
+  color: ${(props) => (props.active ? "green" : "white")};
+  cursor: pointer;
+`;
+const StyleElement = styled.span`
   margin-left: 5px;
 `;
 function RoomList(props) {
@@ -59,7 +61,12 @@ function RoomList(props) {
   const [rooms] = useFireStore("rooms", condition);
   const createRoom = (name, description) => {
     const { accessToken, providerUserInfo, ...remain } = user;
-    addDocument("rooms", { name, description, members: [user.userId] });
+    addDocument("rooms", {
+      name,
+      description,
+      members: [user.userId],
+      type: "room",
+    });
     setShow(false);
   };
   const findUser = (keyWord) => {
@@ -113,68 +120,76 @@ function RoomList(props) {
       </Tag>
     );
   };
-  const handleChange = (value) => {
-    console.log(value);
+  const handleConnect = (_user) => {
+    addDocument("rooms", {
+      fromUserName: user.displayName,
+      toUserName: _user.displayName,
+      fromUser: user.userId,
+      toUser: _user.uid,
+      type: "private",
+      members: [_user.uid, user.userId],
+      photoURLToUser: _user.photoURL,
+    });
   };
+
   return (
     <WrapperStyle>
       <InputStyle
         tagRender={tagRender}
+        showSearch
         labelInValue
         placeholder={"Tìm người"}
         onSearch={findUser}
         notFoundContent={loading ? <Spin size="small" /> : null}
         optionLabelProp="title"
-        onChange={handleChange}
       >
         {userSearch?.map((opt) => (
           <Select.Option key={opt.value} value={opt.value} title={opt.label}>
-            <div className="demo-option-label-item">
-              <Avatar
-                size="small"
-                src={
-                  opt.photoURL
-                    ? opt.photoURL
-                    : opt.label?.charAt(0)?.toUpperCase()
-                }
-              />
+            <StyleTag>
+              <div className="demo-option-label-item">
+                <Avatar
+                  size="small"
+                  src={
+                    opt.photoURL
+                      ? opt.photoURL
+                      : opt.label?.charAt(0)?.toUpperCase()
+                  }
+                />
 
-              {` ${opt.label}`}
-            </div>
+                {` ${opt.label}`}
+              </div>
+              <Button
+                ghost
+                style={{ color: "black" }}
+                onClick={() => handleConnect(opt)}
+              >
+                Nhắn tin
+              </Button>
+            </StyleTag>
           </Select.Option>
         ))}
       </InputStyle>
       <ButtonStyle ghost onClick={() => setShow(true)}>
         Tạo phòng mới
       </ButtonStyle>
-      <Collapse
-        ghost
-        defaultActiveKey={["1"]}
-        expandIcon={({ isActive }) => (
-          <CaretRightOutlined
-            style={{ color: "white" }}
-            rotate={isActive ? 90 : 0}
-          />
-        )}
-        className="site-collapse-custom-collapse"
-      >
-        <StylePanel
-          header="Danh sách các phòng"
-          className="site-collapse-custom-panel"
-          style={{ color: "white" }}
-          key={1}
+
+      {rooms?.map((room) => (
+        <StyleRoom
+          className="room_name"
+          active={room.id === selectedRoom.id}
+          onClick={() => setSelectedRoom(room)}
         >
-          {rooms?.map((room) => (
-            <Text
-              className="room_name"
-              style={{ color: room.id === selectedRoom.id && "blue" }}
-              onClick={() => setSelectedRoom(room)}
-            >
-              {room.name}
-            </Text>
-          ))}
-        </StylePanel>
-      </Collapse>
+          <Avatar
+            src={
+              room?.photoURLToUser ||
+              room?.toUserName?.charAt(0)?.toUpperCase() ||
+              room?.name?.charAt(0)?.toUpperCase()
+            }
+          />
+          <StyleElement>{room?.name || room?.toUserName}</StyleElement>
+        </StyleRoom>
+      ))}
+
       <CreateRoom show={show} setShow={setShow} createRoom={createRoom} />
     </WrapperStyle>
   );

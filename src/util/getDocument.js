@@ -9,11 +9,10 @@ import {
 import { db } from "../firebase/config";
 import { formatSecondsToDate } from "../util/formatDate";
 
-useFireStore.propTypes = {};
+getDocument.propTypes = {};
 
-function useFireStore(_collection, condition) {
+export const getDocument = function (_collection, condition) {
   const [document, setDocument] = useState([]);
-  console.log("before=>", document);
 
   // Loads chat messages history and listens for upcoming ones.
   function loadData() {
@@ -32,12 +31,9 @@ function useFireStore(_collection, condition) {
             mes.createBy = formatSecondsToDate(mes.createAt?.seconds);
           });
           data.sort((a, b) => new Date(a.createBy) - new Date(b.createBy));
-          console.log(`message sorted=>>>>>>>>>>>>${_collection}`, data);
           setDocument(data);
         }
       } else {
-        console.log(`message not sorted=>>>>>>>>>>>>${_collection}`, data);
-
         setDocument(data);
       }
     });
@@ -49,6 +45,4 @@ function useFireStore(_collection, condition) {
   }, [_collection, condition]);
 
   return [document, setDocument];
-}
-
-export default useFireStore;
+};
