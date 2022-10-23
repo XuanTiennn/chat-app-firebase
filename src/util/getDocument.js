@@ -1,19 +1,14 @@
-import { useEffect, useState } from "react";
 import {
   collection,
+  onSnapshot,
   query,
   where,
-  onSnapshot,
-  orderBy,
+  getDocs,
 } from "firebase/firestore";
 import { db } from "../firebase/config";
-import { formatSecondsToDate } from "../util/formatDate";
-
-getDocument.propTypes = {};
 
 export const getDocument = function (_collection, condition) {
-  const [document, setDocument] = useState([]);
-
+  const data = [];
   // Loads chat messages history and listens for upcoming ones.
   function loadData() {
     const q = query(
@@ -21,28 +16,24 @@ export const getDocument = function (_collection, condition) {
       where(condition.fieldName, condition.operator, condition.compareValue)
     );
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const data = [];
       querySnapshot.forEach((doc) => {
         data.push({ ...doc.data(), id: doc.id });
       });
-      if (_collection === "messages") {
-        if (data?.length > 0) {
-          data.map((mes) => {
-            mes.createBy = formatSecondsToDate(mes.createAt?.seconds);
-          });
-          data.sort((a, b) => new Date(a.createBy) - new Date(b.createBy));
-          setDocument(data);
-        }
-      } else {
-        setDocument(data);
-      }
     });
   }
-  useEffect(() => {
-    if (condition.compareValue && condition.compareValue?.length > 0) {
-      loadData();
-    }
-  }, [_collection, condition]);
+  loadData();
+  return data;
+};
+export const getDoc = async (_collection, condition) => {
+  const isExist = [];
+  const q = query(
+    collection(db, _collection),
+    where(condition.fieldName, condition.operator, condition.compareValue)
+  );
+  const querySnapshot = await getDocs(q);
 
-  return [document, setDocument];
+  querySnapshot.forEach((doc) => {
+    isExist.push(doc.data());
+  });
+  return isExist;
 };

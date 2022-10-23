@@ -1,8 +1,9 @@
 import { Button, Col, Row } from "antd";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import React from "react";
-import { auth } from "../firebase/config";
 import { useNavigate } from "react-router-dom";
+import { auth, db } from "../firebase/config";
 import { addDocument, generateKeywords } from "./../firebase/service";
 Login.propTypes = {};
 const ggProvider = new GoogleAuthProvider();
@@ -10,29 +11,34 @@ function Login(props) {
   const history = useNavigate();
   const handleLogin = async (provider) => {
     signInWithPopup(auth, provider)
-      .then((result) => {
+      .then(async (result) => {
         // This gives you a Google Access Token. You can use it to access the Google API.
         const credential = GoogleAuthProvider.credentialFromResult(result);
         const token = credential.accessToken;
-        // The signed-in user info.
-        const user = result.user;
-        addDocument("users", {
-          displayName: user.displayName,
-          email: user.email,
-          photoURL: user.photoURL,
-          uid: user.uid,
-          keywords: generateKeywords(user.displayName?.toLowerCase()),
+        const isExist = [];
+        const q = query(
+          collection(db, "users"),
+          where("uid", "==", result.user.uid)
+        );
+        const querySnapshot = await getDocs(q);
+
+        querySnapshot.forEach((doc) => {
+          isExist.push(doc.data());
         });
+        const user = result.user;
+        if (isExist?.length === 0) {
+          addDocument("users", {
+            displayName: user.displayName,
+            email: user.email,
+            photoURL: user.photoURL,
+            uid: user.uid,
+            keywords: generateKeywords(user.displayName?.toLowerCase()),
+          });
+        }
 
         history("/chat");
       })
       .catch((error) => {
-        // Handle Errors here.
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // The email of the user's account used.
-        const email = error.customData.email;
-        // The AuthCredential type that was used.
         const credential = GoogleAuthProvider.credentialFromError(error);
         // ...
       });

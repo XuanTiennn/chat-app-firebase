@@ -70,7 +70,6 @@ function RoomList(props) {
     setShow(false);
   };
   const findUser = (keyWord) => {
-    console.log(keyWord);
     setLoading(true);
     setUserSearch([]);
     const q = query(
@@ -87,7 +86,8 @@ function RoomList(props) {
           value: doc.data().email,
         });
       });
-      const _data = data.filter((u) => u.userId !== user.userId);
+
+      const _data = data.filter((u) => u.uid !== user.userId);
       setLoading(false);
       setUserSearch(_.unionBy(_data, (u) => u.email));
     });
@@ -129,9 +129,9 @@ function RoomList(props) {
       type: "private",
       members: [_user.uid, user.userId],
       photoURLToUser: _user.photoURL,
+      photoURLfromUser: user.photoUrl,
     });
   };
-
   return (
     <WrapperStyle>
       <InputStyle
@@ -181,12 +181,18 @@ function RoomList(props) {
         >
           <Avatar
             src={
-              room?.photoURLToUser ||
-              room?.toUserName?.charAt(0)?.toUpperCase() ||
-              room?.name?.charAt(0)?.toUpperCase()
+              user.userId !== room.toUser
+                ? room?.photoURLToUser ||
+                  room?.toUserName?.charAt(0)?.toUpperCase() ||
+                  room?.name?.charAt(0)?.toUpperCase()
+                : room?.photoURLfromUser
             }
           />
-          <StyleElement>{room?.name || room?.toUserName}</StyleElement>
+          <StyleElement>
+            {room?.name || user.displayName === room.toUserName
+              ? room?.fromUserName
+              : room.toUserName}
+          </StyleElement>
         </StyleRoom>
       ))}
 

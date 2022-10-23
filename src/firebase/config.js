@@ -1,7 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import {getFirestore} from 'firebase/firestore'
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 const firebaseConfig = {
   apiKey: "AIzaSyBZ2H6sXV7KLF6MdOCaIwxSV3UQcSGcmpk",
   authDomain: "chat-app-820d1.firebaseapp.com",
@@ -14,5 +15,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore();
-export { auth, db };
+const storage = getStorage(app, "gs://chat-app-820d1.appspot.com/");
+export { auth, db, storage };
 export default app;

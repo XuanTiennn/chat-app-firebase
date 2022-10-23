@@ -24,7 +24,6 @@ function ChatContent(props) {
   const app = useContext(AppContext);
   const [selectedRoom] = app.selectedRoom;
   const messagesCondition = useMemo(() => {
-    console.log("change");
     return {
       fieldName: "roomId",
       operator: "==",
@@ -32,8 +31,7 @@ function ChatContent(props) {
     };
   }, [selectedRoom.id]);
   let [messages] = useFireStore("messages", messagesCondition);
-  console.log({ messages, selectedRoom });
-  console.log("length", Object.keys(selectedRoom)?.length > 0);
+
   return (
     <ChatContentStyle>
       {Object.keys(selectedRoom)?.length > 0 ? (
@@ -50,7 +48,7 @@ function ChatContent(props) {
               />
             ))}
           </MessageStyle>
-            <InputText />{" "}
+          <InputText />{" "}
         </>
       ) : (
         <Typography.Paragraph type="center">
