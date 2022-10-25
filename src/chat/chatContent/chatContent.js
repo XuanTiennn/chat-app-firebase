@@ -45,6 +45,7 @@ function ChatContent(props) {
                 text={x?.value}
                 user={x}
                 createAt={x?.createAt?.seconds}
+                file={x.imgs}
               />
             ))}
           </MessageStyle>

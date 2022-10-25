@@ -5,6 +5,7 @@ import styled from "styled-components";
 import { db } from "../../firebase/config";
 import { AppContext } from "./../../context/appContext";
 import InviteMember from "./inviteMember";
+import { AuthContext } from "./../../context/authContext";
 
 RoomInfo.propTypes = {};
 const RoomStyle = styled.div`
@@ -28,11 +29,13 @@ const TitleStyle = styled(Typography.Title)`
 const TextStyle = styled(Typography.Text)`
   color: white !important;
 `;
+
 function RoomInfo(props) {
   const app = useContext(AppContext);
   const { selectedRoom, members } = app;
   const [show, setShow] = useState(false);
   const [form] = Form.useForm();
+  const user = useContext(AuthContext);
   const inviteMember = (value, setValue) => {
     // reset form value
     form.resetFields();
@@ -48,7 +51,11 @@ function RoomInfo(props) {
     <RoomStyle>
       <div>
         <TitleStyle>
-          {selectedRoom[0].name || selectedRoom[0].toUserName}
+          {selectedRoom[0]?.type !== "private"
+            ? selectedRoom[0].name
+            : user.userId === selectedRoom[0].fromUser
+            ? selectedRoom[0].toUserName
+            : selectedRoom[0].fromUserName}
         </TitleStyle>
         <TextStyle>{selectedRoom[0].description}</TextStyle>
       </div>

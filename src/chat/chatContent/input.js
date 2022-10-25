@@ -1,4 +1,4 @@
-import { CloseCircleOutlined, FileImageOutlined } from "@ant-design/icons";
+import { CloseCircleOutlined, FileImageOutlined, UploadOutlined } from "@ant-design/icons";
 import { Button, Input } from "antd";
 import {
   deleteObject,
@@ -26,13 +26,18 @@ const InputStyle = styled(Input)`
 `;
 const IconXStyle = styled(CloseCircleOutlined)`
   position: absolute;
-  top: -30px;
+  top:${(props) => (props.file ? props.fileTop : props.imgTop)}; 
   right: -4px;
   color: white;
   background-color: black;
   border-radius: 100%;
 `;
-
+const fileStyle = {
+  padding: "5px",
+  borderRadius: "5px",
+  border: "1px solid",
+  backgroundColor:'#d9d9d9'
+};
 function InputText(props) {
   const [message, setMessage] = useState("");
   const user = useContext(AuthContext);
@@ -46,8 +51,10 @@ function InputText(props) {
       roomId: selectedRoom.id,
       displayName: user.displayName,
       photoURL: user.photoUrl,
+      imgs:imgs
     });
     setMessage("");
+    setImgs([])
   };
 
   const handleSubmit = (_file) => {
@@ -114,16 +121,25 @@ function InputText(props) {
           >
             {imgs.map((img, index) => (
               <span style={{ position: "relative" }}>
-                <img
-                  style={{
-                    width: "70px",
-                    height: "70px",
-                    margin: "0 5px",
-                    borderRadius: "5px",
-                  }}
-                  src={img.downloadURL}
-                />
-                <IconXStyle onClick={() => deleteImg(img, index)} />
+                {img.type.includes("image") ? (
+                  <>
+                    <img
+                      style={{
+                        width: "70px",
+                        height: "70px",
+                        margin: "0 5px",
+                        borderRadius: "5px",
+                      }}
+                      src={img.downloadURL}
+                    />
+                    <IconXStyle imgTop={'-30px'} onClick={() => deleteImg(img, index)} />
+                  </>
+                ) : (
+                  <>
+                    <span style={fileStyle}> {img.fileName} </span>
+                    <IconXStyle file={true} fileTop={'-12px'} onClick={() => deleteImg(img, index)} />
+                  </>
+                )}
               </span>
             ))}
           </div>
@@ -141,7 +157,7 @@ function InputText(props) {
                   onChange={(e) => saveFile(e)}
                 />
                 <label htmlFor="file">
-                  <FileImageOutlined style={{ cursor: "pointer" }} />
+                  <UploadOutlined style={{ cursor: "pointer" }} />
                 </label>
                 <ButtonStyle type="primary" onClick={addMessage}>
                   Gửi

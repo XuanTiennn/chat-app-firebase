@@ -1,10 +1,11 @@
 import {
   collection,
+  getDocs,
   onSnapshot,
   query,
   where,
-  getDocs,
 } from "firebase/firestore";
+import { deleteObject, getStorage, ref } from "firebase/storage";
 import { db } from "../firebase/config";
 
 export const getDocument = function (_collection, condition) {
@@ -36,4 +37,19 @@ export const getDoc = async (_collection, condition) => {
     isExist.push(doc.data());
   });
   return isExist;
+};
+export const deleteFile = (file) => {
+  const storage = getStorage();
+
+  // Create a reference to the file to delete
+  const desertRef = ref(storage, `files/${file.fileName}`);
+
+  // Delete the file
+  deleteObject(desertRef)
+    .then(() => {
+      // File deleted successfully
+    })
+    .catch((error) => {
+      // Uh-oh, an error occurred!
+    });
 };
